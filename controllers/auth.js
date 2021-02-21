@@ -5,7 +5,6 @@ const keys = require("../config/keys");
 
 module.exports.login = async (req, res) => {
     const candidate = await User.findOne({ nickname: req.body.nickname })
-
     if (candidate) {
         //checking password
         const passwordResult = bcrypt.compareSync(req.body.password, candidate.password)
@@ -16,7 +15,7 @@ module.exports.login = async (req, res) => {
                 userId: candidate._id
             }, keys.jwt, { expiresIn: 60 * 60 })
 
-            res.status(200).json({ token: `Bearer: ${token}` })
+            res.status(200).json({ token: `Bearer ${token}` })
         } else {
             // Passwords mismatch
             res.status(401).json({
@@ -38,7 +37,7 @@ module.exports.register = async (req, res) => {
     if (candidate) {
         // Email already exist
         res.status(409).json({
-            message: "This email is already taken."
+            message: "This nickname is already taken."
         });
     } else {
         // adding user in DB
