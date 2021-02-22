@@ -50,7 +50,13 @@ module.exports.register = async (req, res) => {
 
         try {
             await user.save();
-            res.status(201).json(user)
+
+            const token = jwt.sign({
+                nickname: user.nickname,
+                userId: user._id
+            }, keys.jwt, { expiresIn: 60 * 60 })
+
+            res.status(201).json({ token: `Bearer ${token}` })
         } catch (e) {
             console.log(e)
         }
