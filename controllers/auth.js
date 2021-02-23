@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/UserModel");
 const keys = require("../config/keys");
+const errorHandler = require("../utils/errorHandler")
 
 module.exports.login = async (req, res) => {
     const candidate = await User.findOne({ nickname: req.body.nickname })
@@ -9,13 +10,20 @@ module.exports.login = async (req, res) => {
         //checking password
         const passwordResult = bcrypt.compareSync(req.body.password, candidate.password)
         if (passwordResult) {
+            const { _id, nickname, publications } = candidate
             //token generation
             const token = jwt.sign({
-                nickname: candidate.nickname,
-                userId: candidate._id
+                nickname,
+                userId: _id,
+                publications,
             }, keys.jwt, { expiresIn: 60 * 60 })
 
-            res.status(200).json({ token: `Bearer ${token}` })
+            res.status(200).json({
+                token: `Bearer ${token}`,
+                nickname,
+                userId: _id,
+                publications,
+            })
         } else {
             // Passwords mismatch
             res.status(401).json({
@@ -45,20 +53,22 @@ module.exports.register = async (req, res) => {
         const password = req.body.password;
         const user = new User({
             nickname: req.body.nickname,
-            password: bcrypt.hashSync(password, salt)
+            password: bcrypt.hashSync(password, salt),
+            publications: []
         });
 
         try {
             await user.save();
-
+            const { _id, nickname, publications } = user
             const token = jwt.sign({
-                nickname: user.nickname,
-                userId: user._id
+                nickname,
+                userId: _id,
+                publications,
             }, keys.jwt, { expiresIn: 60 * 60 })
 
-            res.status(201).json({ token: `Bearer ${token}` })
-        } catch (e) {
-            console.log(e)
+            res.status(201).json({ token: `Bearer ${token}`, userId: _id, nickname, publications })
+        } catch (error) {
+            errorHandler(error, res)
         }
     }
 }

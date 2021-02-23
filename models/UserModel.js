@@ -13,7 +13,9 @@ const userSchema = new Schema({
         type: String,
         required: true,
         minlength: 8,
-    }
+    }, publications: [{
+        type: Schema.Types.ObjectId, ref: "publications"
+    }]
 }, { versionKey: false, autoIndex: false });
 
 module.exports = mongoose.model("users", userSchema);
