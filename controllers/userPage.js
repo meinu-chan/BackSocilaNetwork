@@ -1,9 +1,10 @@
+const _ = require("lodash");
 // const mongoose = require('mongoose');
 const Publication = require("../models/PublicationModel")
+// const Likes = require("../models/LikesModel");
 const errorHandler = require("../utils/errorHandler")
 
 module.exports.user = (req, res) => {
-    // console.log(req)
     const { _id, nickname, publications } = req.user
     res.status(200).json({
         _id, nickname, publications
@@ -37,26 +38,50 @@ module.exports.publication = async (req, res) => {
 
 module.exports.rate = async (req, res) => {
 
-    const { user: { publications }, body: { publicId, status } } = req
+    const { user: { publications, _id }, body: { publicId } } = req
 
-    const _id = publications.find(publ => publ == publicId)
+    const publicationId = publications.find(publ => publ == publicId)
 
-    if (_id) {
+    if (publicationId) {
+        const publication = await Publication.findById(publicId)
 
-        const publication = await Publication.findById({ _id })
+        const { likes, likedUsers } = publication;
+
+        let flag = likedUsers.find(userId => userId == _id)
+        if (flag) {
+            const count = likes - 1;
+            _.remove(likedUsers, (userId) => userId == flag)
+            await publication.updateOne({ likes: count, likedUsers: [...likedUsers] })
+            flag = false
+        } else {
+            const count = likes + 1;
+            await publication.updateOne({ likes: count, likedUsers: likedUsers.push(_id) })
+            flag = true
+        }
         try {
-            status ? publication.likes++ : publication.likes--
             await publication.save()
             res.status(200).json({
-                publications
+                publication, flag
             })
-
         } catch (error) {
             errorHandler(error, res)
         }
-    } else {
+
+    }
+}
+
+module.exports.getPubl = async (req, res) => {
+    const { user: { publications } } = req
+    if (publications === []) {
         res.status(404).json({
-            message: "Something go wrong..."
+            message: "No publications."
         })
+    } else {
+        const publics = []
+        for (const publId in publications) {
+            const publication = await Publication.findById({ _id: publications[publId] })
+            publics.push(publication)
+        }
+        res.status(200).json({ publications: publics })
     }
 }

@@ -16,8 +16,14 @@ const publicationSchema = new Schema({
     },
     likes: {
         type: Number,
-        default: 0
+        default: 0,
+        min: 0
     },
+    likedUsers: [
+        {
+            type: String
+        }
+    ]
 }, { versionKey: false, autoIndex: false });
 
 module.exports = mongoose.model("publications", publicationSchema);
