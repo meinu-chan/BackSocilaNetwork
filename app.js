@@ -4,6 +4,8 @@ const passport = require("passport");
 const bodyParser = require("body-parser");
 const authRoutes = require("./routes/auth")
 const userPageRoutes = require("./routes/userPage")
+const publicationRoutes = require("./routes/publication")
+const commentRoutes = require("./routes/comment")
 const keys = require("./config/keys");
 const app = express();
 
@@ -21,6 +23,8 @@ app.use(bodyParser.json())
 
 app.use("/api/auth", authRoutes)
 app.use("/api/page", userPageRoutes)
+app.use("/api/publication", publicationRoutes)
+app.use("/api/comment", commentRoutes)
 
 
 module.exports = app

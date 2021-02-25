@@ -23,6 +23,11 @@ const publicationSchema = new Schema({
         {
             type: String
         }
+    ],
+    comments: [
+        {
+            type: Schema.Types.ObjectId, ref: "comments"
+        }
     ]
 }, { versionKey: false, autoIndex: false });
 
