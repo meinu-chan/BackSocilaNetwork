@@ -34,35 +34,43 @@ module.exports.publication = async (req, res) => {
 
 module.exports.rate = async (req, res) => {
 
-    const { user: { publications, _id }, body: { publicId } } = req
+    const { user: { _id }, body: { publicId } } = req
 
-    const publicationId = publications.find(publ => publ == publicId)
+    const publication = await Publication.findById(publicId)
 
-    if (publicationId) {
-        const publication = await Publication.findById(publicId)
-
+    if (publication) {
         const { likes, likedUsers } = publication;
 
-        let flag = likedUsers.find(userId => userId == _id)
+        const _likedUsers = [...likedUsers]
+
+        let flag = likedUsers.includes(_id)
+        console.log(flag, "flag")
+        console.log()
         if (flag) {
             const count = likes - 1;
-            _.remove(likedUsers, (userId) => userId == flag)
-            await publication.updateOne({ likes: count, likedUsers: [...likedUsers] })
-            flag = false
+            console.log(likedUsers)
+            _.remove(_likedUsers, (userId) => userId == _id)
+            console.log(_likedUsers)
+            await publication.updateOne({ likes: count, likedUsers: [..._likedUsers] })
         } else {
             const count = likes + 1;
-            await publication.updateOne({ likes: count, likedUsers: likedUsers.push(_id) })
-            flag = true
+            _likedUsers.push(_id)
+            await publication.updateOne({ likes: count, likedUsers: _likedUsers })
         }
         try {
             await publication.save()
             res.status(200).json({
-                publication, flag
+                publication, flag: !flag
             })
         } catch (error) {
             errorHandler(error, res)
         }
 
+    }
+    else {
+        res.status(404).json({
+            message: "Publication didn't found."
+        })
     }
 }
 
@@ -80,8 +88,4 @@ module.exports.getPubl = async (req, res) => {
         }
         res.status(200).json({ publications: publics })
     }
-}
-
-module.exports.addComments = (req, res) => {
-    console.log(req)
 }
