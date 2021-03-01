@@ -2,11 +2,4 @@
 const app = require("./app");
 const PORT = process.env.PORT || 5000
 
-// const Users = new UserDB();
-
-// Users.addUser({ login: "aaa", email: "aaa@" })
-// Users.findUserBy({ email: "aaa@" })
-// Users.deleteUser({  email: "aaa@" })
-// Users.clearCollection()
-// Users.showUsers()
 app.listen(PORT, () => console.log(`Server has been started: http://localhost:${PORT}`));
