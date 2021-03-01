@@ -10,6 +10,6 @@ router.put("/", passport.authenticate("jwt", { session: false }), controller.pub
 router.put("/rate", passport.authenticate("jwt", { session: false }), controller.rate)
 
 // localhost:5000/api/publication/getAll
-router.get("/getAll", passport.authenticate("jwt", { session: false }), controller.getPubl)
+router.get("/getAll/:userId", controller.getPubl)
 
 module.exports = router

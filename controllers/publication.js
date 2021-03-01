@@ -1,14 +1,13 @@
 const _ = require("lodash");
 // const mongoose = require('mongoose');
 const Publication = require("../models/PublicationModel")
+const User = require("../models/UserModel")
 // const Likes = require("../models/LikesModel");
 const errorHandler = require("../utils/errorHandler")
 
 
 module.exports.publication = async (req, res) => {
     const { user: { _id: userId, publications }, body: { value } } = req
-
-    console.log(value)
 
     if (userId && publications && value) {
         const publication = new Publication({
@@ -34,7 +33,7 @@ module.exports.publication = async (req, res) => {
 
 module.exports.rate = async (req, res) => {
 
-    const { user: { _id }, body: { publicId } } = req
+    const { body: { publicId, userId } } = req
 
     const publication = await Publication.findById(publicId)
 
@@ -43,18 +42,14 @@ module.exports.rate = async (req, res) => {
 
         const _likedUsers = [...likedUsers]
 
-        let flag = likedUsers.includes(_id)
-        console.log(flag, "flag")
-        console.log()
+        let flag = likedUsers.includes(userId)
         if (flag) {
             const count = likes - 1;
-            console.log(likedUsers)
-            _.remove(_likedUsers, (userId) => userId == _id)
-            console.log(_likedUsers)
+            _.remove(_likedUsers, (userId) => userId == userId)
             await publication.updateOne({ likes: count, likedUsers: [..._likedUsers] })
         } else {
             const count = likes + 1;
-            _likedUsers.push(_id)
+            _likedUsers.push(userId)
             await publication.updateOne({ likes: count, likedUsers: _likedUsers })
         }
         try {
@@ -75,17 +70,22 @@ module.exports.rate = async (req, res) => {
 }
 
 module.exports.getPubl = async (req, res) => {
-    const { user: { publications } } = req
-    if (publications === []) {
-        res.status(404).json({
-            message: "No publications."
-        })
-    } else {
+    const { params: { userId } } = req
+
+    const user = await User.findById(userId)
+
+    const { publications } = user
+    if (user) {
         const publics = []
         for (const publId in publications) {
-            const publication = await Publication.findById({ _id: publications[publId] })
+            const publication = await Publication.findById(publications[publId]).catch(err => console.log(err))
             publics.push(publication)
         }
         res.status(200).json({ publications: publics })
+
+    } else {
+        res.status(404).json({
+            message: "No publications."
+        })
     }
 }

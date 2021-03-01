@@ -15,7 +15,11 @@ const userSchema = new Schema({
         minlength: 8,
     }, publications: [{
         type: Schema.Types.ObjectId, ref: "publications"
-    }]
+    }],
+    friends: [{
+        type: Schema.Types.ObjectId, ref: "friends"
+    }
+    ]
 }, { versionKey: false, autoIndex: false });
 
 module.exports = mongoose.model("users", userSchema);

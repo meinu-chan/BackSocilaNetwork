@@ -17,18 +17,18 @@ module.exports.addComment = async (req, res) => {
         console.log(comment)
         try {
             await comment.save()
-                .catch(e => errorHandler(e))
+                .catch(e => errorHandler(e, res))
 
             publication.updateOne({ comments: publication.comments.push(comment) })
 
             await publication.save()
-                .catch(e => errorHandler(e))
+                .catch(e => errorHandler(e, res))
 
             res.status(201).json({
                 comment
             })
         } catch (error) {
-            errorHandler(error);
+            errorHandler(error, res);
         }
     } else {
         res.status(404).json({

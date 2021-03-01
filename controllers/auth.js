@@ -10,12 +10,13 @@ module.exports.login = async (req, res) => {
         //checking password
         const passwordResult = bcrypt.compareSync(req.body.password, candidate.password)
         if (passwordResult) {
-            const { _id, nickname, publications } = candidate
+            const { _id, nickname, publications, friends } = candidate
             //token generation
             const token = jwt.sign({
                 nickname,
                 userId: _id,
                 publications,
+                friends,
             }, keys.jwt, { expiresIn: 60 * 60 })
 
             res.status(200).json({
@@ -23,6 +24,7 @@ module.exports.login = async (req, res) => {
                 nickname,
                 userId: _id,
                 publications,
+                friends
             })
         } else {
             // Passwords mismatch
@@ -54,19 +56,21 @@ module.exports.register = async (req, res) => {
         const user = new User({
             nickname: req.body.nickname,
             password: bcrypt.hashSync(password, salt),
-            publications: []
+            publications: [],
+            friends: []
         });
 
         try {
             await user.save();
-            const { _id, nickname, publications } = user
+            const { _id, nickname, publications, friends } = user
             const token = jwt.sign({
                 nickname,
                 userId: _id,
                 publications,
+                friends,
             }, keys.jwt, { expiresIn: 60 * 60 })
 
-            res.status(201).json({ token: `Bearer ${token}`, userId: _id, nickname, publications })
+            res.status(201).json({ token: `Bearer ${token}`, userId: _id, nickname, publications, friends })
         } catch (error) {
             errorHandler(error, res)
         }
