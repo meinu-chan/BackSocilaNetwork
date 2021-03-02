@@ -1,6 +1,7 @@
 const { ObjectID } = require("bson")
 const User = require("../models/UserModel")
 const errorHandler = require("../utils/errorHandler")
+const _ = require("lodash")
 
 module.exports.user = (req, res) => {
     const { _id, nickname, publications, friends } = req.user
@@ -49,16 +50,27 @@ module.exports.findByName = async (req, res) => {
 }
 
 module.exports.addFriend = async (req, res) => {
-    const { user: { _id }, body: { userId } } = req
-    const user = await User.findById(_id)
-    if (user) {
-        const { friends } = user
-        try {
-            friends.push(userId)
-            await user.save()
-            res.status(200).json({ user })
-        } catch (error) {
-            errorHandler(error, res)
+    const { user, body: { userId, status } } = req
+
+    const newFriend = await User.findById(userId)
+    if (user && newFriend) {
+        if (status) {
+            const { friends } = user
+            try {
+                friends.push(userId)
+                await user.save()
+                res.status(200).json({ user })
+            } catch (error) {
+                errorHandler(error, res)
+            }
+        }
+        else {
+            const arrRes = _.remove([...user.waitingForResponse], (index) => index != userId)
+            await user.updateOne({ waitingForResponse: arrRes })
+            const arrReq = _.remove(newFriend.requests, (id) => id != user._id)
+            await newFriend.updateOne({ requests: arrReq })
+
+            res.status(200).json({ user, newFriend })
         }
     } else {
         res.status(404).json({
@@ -98,4 +110,40 @@ module.exports.getFriends = async (req, res) => {
     } catch (error) {
         errorHandler(error, res)
     }
+}
+
+module.exports.sendRequest = async (req, res) => {
+    const { body: { userId, status }, user } = req
+
+    const potentialFriend = await User.findById(userId)
+
+    if (potentialFriend && user) {
+        try {
+            if (status) {
+                await potentialFriend.updateOne({ waitingForResponse: [...potentialFriend.waitingForResponse, user._id] })
+                await user.updateOne({ requests: [...user.requests, userId] })
+
+                res.status(200).json({
+                    waiting: true
+                })
+            } else {
+                const arrRes = _.remove([...user.requests], (index) => index != userId)
+                await potentialFriend.updateOne({ waitingForResponse: arrRes })
+                const arrReq = _.remove(potentialFriend.requests, (id) => id != user._id)
+                await user.updateOne({ requests: arrReq })
+
+                res.status(200).json({
+                    waiting: false
+                })
+            }
+        } catch (error) {
+            errorHandler(error, res)
+        }
+    }
+    else {
+        res.status(404).json({
+            message: "User doesn't exist."
+        })
+    }
+
 }

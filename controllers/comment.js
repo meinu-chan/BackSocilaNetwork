@@ -14,7 +14,6 @@ module.exports.addComment = async (req, res) => {
         const comment = new Comment({
             userId, date: Date.now(), value
         })
-        console.log(comment)
         try {
             await comment.save()
                 .catch(e => errorHandler(e, res))

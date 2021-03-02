@@ -18,4 +18,7 @@ router.put("/friends/add", passport.authenticate("jwt", { session: false }), con
 // localhost:5000/api/page/friends
 router.get("/friends/:id", controller.getFriends)
 
+// localhost:5000/api/page/friends/send
+router.put("/friends/send", passport.authenticate("jwt", { session: false }), controller.sendRequest)
+
 module.exports = router

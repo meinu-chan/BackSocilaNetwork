@@ -19,7 +19,14 @@ const userSchema = new Schema({
     friends: [{
         type: Schema.Types.ObjectId, ref: "friends"
     }
-    ]
+    ],
+    requests: [{
+        type: String
+    }],
+    waitingForResponse: [{
+        type: String
+    }]
+
 }, { versionKey: false, autoIndex: false });
 
 module.exports = mongoose.model("users", userSchema);

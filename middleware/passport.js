@@ -13,7 +13,7 @@ const options = {
 module.exports = passport => {
     passport.use(
         new JwtStrategy(options, async (payload, done) => {
-            const user = await User.findById(payload.userId).select("publications id nickname")
+            const user = await User.findById(payload.userId).select("publications id nickname friends requests waitingForResponse")
 
             try {
                 if (user) {

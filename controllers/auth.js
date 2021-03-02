@@ -10,13 +10,16 @@ module.exports.login = async (req, res) => {
         //checking password
         const passwordResult = bcrypt.compareSync(req.body.password, candidate.password)
         if (passwordResult) {
-            const { _id, nickname, publications, friends } = candidate
+            const { _id, nickname, publications,
+                friends, requests, waitingForResponse, } = candidate
             //token generation
             const token = jwt.sign({
                 nickname,
                 userId: _id,
                 publications,
                 friends,
+                requests,
+                waitingForResponse,
             }, keys.jwt, { expiresIn: 60 * 60 })
 
             res.status(200).json({
@@ -24,7 +27,10 @@ module.exports.login = async (req, res) => {
                 nickname,
                 userId: _id,
                 publications,
-                friends
+                friends,
+                requests,
+                waitingForResponse,
+
             })
         } else {
             // Passwords mismatch
@@ -57,20 +63,33 @@ module.exports.register = async (req, res) => {
             nickname: req.body.nickname,
             password: bcrypt.hashSync(password, salt),
             publications: [],
-            friends: []
+            friends: [],
+            requests: [],
+            waitingForResponse: [],
+
         });
 
         try {
             await user.save();
-            const { _id, nickname, publications, friends } = user
+            const { _id, nickname, publications,
+                friends, requests, waitingForResponse, } = user
             const token = jwt.sign({
                 nickname,
                 userId: _id,
                 publications,
                 friends,
+                requests,
+                waitingForResponse,
             }, keys.jwt, { expiresIn: 60 * 60 })
 
-            res.status(201).json({ token: `Bearer ${token}`, userId: _id, nickname, publications, friends })
+            res.status(201).json({
+                token: `Bearer ${token}`,
+                userId: _id, nickname,
+                publications,
+                friends,
+                requests,
+                waitingForResponse,
+            })
         } catch (error) {
             errorHandler(error, res)
         }
