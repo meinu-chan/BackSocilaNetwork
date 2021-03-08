@@ -8,7 +8,7 @@ const errorHandler = require("../utils/errorHandler")
 module.exports.addComment = async (req, res) => {
     const { user: { _id: userId }, body: { publicId, value } } = req
 
-    const publication = await Publication.findById(publicId)
+    const publication = await Publication.findById({ _id: publicId })
 
     if (publication) {
         const comment = new Comment({
@@ -38,7 +38,7 @@ module.exports.addComment = async (req, res) => {
 module.exports.getComment = async (req, res) => {
     const { body: { commentId } } = req
 
-    const comment = await Comment.findById(commentId)
+    const comment = await Comment.findById({ _id: commentId })
 
     const user = await User.findById(comment.userId)
 

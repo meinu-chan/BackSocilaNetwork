@@ -15,7 +15,7 @@ module.exports.findById = async (req, res) => {
     try {
         const userId = id.replace("id=", "")
 
-        const user = await User.findById(ObjectID(userId)).catch(err => console.log(err))
+        const user = await User.findById({ _id: userId }).catch(err => console.log(err))
 
         if (user) {
             res.status(200).json({
@@ -52,7 +52,7 @@ module.exports.findByName = async (req, res) => {
 module.exports.addFriend = async (req, res) => {
     const { user, body: { userId, status } } = req
 
-    const newFriend = await User.findById(userId)
+    const newFriend = await User.findById({ _id: userId })
     if (user && newFriend) {
         if (status) {
             const { friends } = user
@@ -84,7 +84,7 @@ module.exports.getFriends = async (req, res) => {
     try {
         const userId = id.replace("id=", "")
 
-        const user = await User.findById(userId)
+        const user = await User.findById({ _id: userId })
 
         if (user) {
             const { friends } = user
@@ -92,7 +92,7 @@ module.exports.getFriends = async (req, res) => {
             const fs = []
 
             for (const friendId in friends) {
-                const friend = await User.findById(friends[friendId])
+                const friend = await User.findById({ _id: friends[friendId] })
                 const { publications, _id, nickname } = friend
                 fs.push({ publications, friends: friend.friends, _id, nickname })
             }
@@ -115,7 +115,7 @@ module.exports.getFriends = async (req, res) => {
 module.exports.sendRequest = async (req, res) => {
     const { body: { userId, status }, user } = req
 
-    const potentialFriend = await User.findById(userId)
+    const potentialFriend = await User.findById({ _id: userId })
 
     if (potentialFriend && user) {
         try {

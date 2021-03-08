@@ -14,11 +14,6 @@ const publicationSchema = new Schema({
         type: String,
         maxLength: 1000,
     },
-    likes: {
-        type: Number,
-        default: 0,
-        min: 0
-    },
     likedUsers: [
         {
             type: String
