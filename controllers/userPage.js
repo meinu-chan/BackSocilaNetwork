@@ -59,6 +59,8 @@ module.exports.addFriend = async (req, res) => {
             try {
                 friends.push(userId)
                 await user.save()
+                newFriend.friends.push(user._id)
+                await newFriend.save()
                 res.status(200).json({ user })
             } catch (error) {
                 errorHandler(error, res)
