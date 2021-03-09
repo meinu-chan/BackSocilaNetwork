@@ -4,9 +4,9 @@ const errorHandler = require("../utils/errorHandler")
 const _ = require("lodash")
 
 module.exports.user = (req, res) => {
-    const { _id, nickname, publications, friends } = req.user
+    const { user } = req
     res.status(200).json({
-        _id, nickname, publications, friends
+        user
     })
 }
 
@@ -115,29 +115,31 @@ module.exports.getFriends = async (req, res) => {
 }
 
 module.exports.sendRequest = async (req, res) => {
-    const { body: { userId, status }, user } = req
+    const { body: { userId }, user } = req
 
     const potentialFriend = await User.findById({ _id: userId })
 
     if (potentialFriend && user) {
         try {
+            const { waitingForResponse } = potentialFriend
+            const { requests } = user
+            const status = !waitingForResponse.includes(user._id)
             if (status) {
-                await potentialFriend.updateOne({ waitingForResponse: [...potentialFriend.waitingForResponse, user._id] })
-                await user.updateOne({ requests: [...user.requests, userId] })
-
-                res.status(200).json({
-                    waiting: true
-                })
+                waitingForResponse.push(user._id)
+                await potentialFriend.save()
+                requests.push(userId)
+                await user.save()
             } else {
-                const arrRes = _.remove([...user.requests], (index) => index != userId)
-                await potentialFriend.updateOne({ waitingForResponse: arrRes })
-                const arrReq = _.remove(potentialFriend.requests, (id) => id != user._id)
-                await user.updateOne({ requests: arrReq })
-
-                res.status(200).json({
-                    waiting: false
-                })
+                _.remove(requests, (id) => id == userId)
+                await user.updateOne({ requests })
+                _.remove(waitingForResponse, (id) => id == user._id)
+                await potentialFriend.updateOne({ waitingForResponse })
             }
+
+            res.status(200).json({
+                potentialFriend,
+            })
+
         } catch (error) {
             errorHandler(error, res)
         }
@@ -147,5 +149,4 @@ module.exports.sendRequest = async (req, res) => {
             message: "User doesn't exist."
         })
     }
-
 }
