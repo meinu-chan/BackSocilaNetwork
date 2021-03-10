@@ -61,19 +61,18 @@ module.exports.addFriend = async (req, res) => {
                 await user.save()
                 newFriend.friends.push(user._id)
                 await newFriend.save()
-                res.status(200).json({ user })
             } catch (error) {
                 errorHandler(error, res)
             }
         }
-        else {
-            const arrRes = _.remove([...user.waitingForResponse], (index) => index != userId)
-            await user.updateOne({ waitingForResponse: arrRes })
-            const arrReq = _.remove(newFriend.requests, (id) => id != user._id)
-            await newFriend.updateOne({ requests: arrReq })
+        const { requests } = newFriend
+        const { waitingForResponse } = user
+        _.remove(waitingForResponse, (index) => index == userId)
+        await user.updateOne({ waitingForResponse })
+        _.remove(requests, (id) => id == user._id)
+        await newFriend.updateOne({ requests })
+        res.status(200).json({ user })
 
-            res.status(200).json({ user, newFriend })
-        }
     } else {
         res.status(404).json({
             message: "User with this id didn't found."

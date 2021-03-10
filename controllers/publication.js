@@ -1,8 +1,6 @@
 const _ = require("lodash");
-const mongoose = require('mongoose');
 const Publication = require("../models/PublicationModel")
 const User = require("../models/UserModel")
-// const Likes = require("../models/LikesModel");
 const errorHandler = require("../utils/errorHandler")
 
 
@@ -34,8 +32,6 @@ module.exports.publication = async (req, res) => {
 module.exports.rate = async (req, res) => {
 
     const { user: { _id }, body: { publicId } } = req
-
-    console.log(_id)
 
     const publication = await Publication.findById(publicId)
 
