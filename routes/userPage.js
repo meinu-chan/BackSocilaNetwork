@@ -3,9 +3,6 @@ const controller = require("../controllers/userPage")
 const passport = require("passport");
 const router = express.Router();
 
-// localhost:5000/api/page
-router.get("/", passport.authenticate("jwt", { session: false }), controller.user)
-
 // localhost:5000/api/page/find/id=123
 router.get("/find/:id", controller.findById)
 

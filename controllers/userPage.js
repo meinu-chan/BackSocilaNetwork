@@ -1,14 +1,6 @@
-const { ObjectID } = require("bson")
 const User = require("../models/UserModel")
 const errorHandler = require("../utils/errorHandler")
 const _ = require("lodash")
-
-module.exports.user = (req, res) => {
-    const { user } = req
-    res.status(200).json({
-        user
-    })
-}
 
 module.exports.findById = async (req, res) => {
     const { params: { id } } = req
