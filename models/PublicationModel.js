@@ -12,7 +12,7 @@ const publicationSchema = new Schema({
     },
     value: {
         type: String,
-        maxLength: 1000,
+        maxLength: 2000,
     },
     likedUsers: [
         {

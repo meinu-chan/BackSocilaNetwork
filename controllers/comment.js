@@ -43,10 +43,10 @@ module.exports.getComment = async (req, res) => {
     const user = await User.findById(comment.userId)
 
     if (comment && user) {
-        const { nickname } = user
+        const { nickname, _id: userId } = user
         const { _id, date, value } = comment
         res.status(200).json({
-            _id, date, value, nickname
+            _id, date, value, nickname, userId
         })
     } else {
         res.status(404).json({
