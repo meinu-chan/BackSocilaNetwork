@@ -141,3 +141,36 @@ module.exports.sendRequest = async (req, res) => {
         })
     }
 }
+
+module.exports.deleteFriend = async (req, res) => {
+    const { body: { userId }, user } = req
+
+    const ex_friend = await User.findById(userId)
+    if (ex_friend) {
+        if (ex_friend.friends.includes(user._id)) {
+            const { friends: f_friends, _id: f_id } = ex_friend;
+            const { friends: u_friends, _id: u_id } = user;
+            try {
+                _.remove(f_friends, (id) => id == u_id.toString())
+                await ex_friend.updateOne({ friends: f_friends })
+                _.remove(u_friends, (id) => id == f_id.toString())
+                await user.updateOne({ friends: u_friends })
+
+                res.status(200).json({
+                    ex_friend: ex_friend.friends
+                })
+            } catch (error) {
+                errorHandler(error, res)
+            }
+        }
+        else {
+            res.status(404).json({
+                message: "Friend does not exist."
+            })
+        }
+    } else {
+        res.status(404).json({
+            message: "User does not exist."
+        })
+    }
+}
