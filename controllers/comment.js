@@ -1,5 +1,4 @@
 const _ = require("lodash");
-// const mongoose = require('mongoose');
 const Comment = require("../models/CommentsModel")
 const Publication = require("../models/PublicationModel");
 const User = require("../models/UserModel");
