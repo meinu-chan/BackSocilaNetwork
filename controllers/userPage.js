@@ -28,7 +28,6 @@ module.exports.findById = (req, res) => {
 
         userPromise.then(user => getFriendsObj(user))
             .then(user => {
-                // console.log(user)
                 res.status(200).json({
                     user
                 })

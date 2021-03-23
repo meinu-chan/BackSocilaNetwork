@@ -98,4 +98,8 @@ module.exports.register = async (req, res) => {
 
 module.exports.logOut = async (req, res) => {
     req.logout();
+
+    res.status(200).json({
+        success: true
+    })
 }
