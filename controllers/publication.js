@@ -93,7 +93,7 @@ module.exports.show = async (req, res) => {
 
         const publication = await Publication.findById(id)
 
-        res.status(200).json(publication.view())
+        res.status(200).json({ ...publication.view(), nickname: user.nickname })
 
     } catch (error) {
         console.log(error)
