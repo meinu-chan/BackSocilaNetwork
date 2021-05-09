@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const Publication = require("../models/PublicationModel")
 const User = require("../models/UserModel")
+const Comment = require("../models/CommentsModel")
 const errorHandler = require("../utils/errorHandler")
 
 
@@ -93,7 +94,10 @@ module.exports.show = async (req, res) => {
 
         const p = await Publication.findById(id)
         const publication = p.view()
+
         const { nickname } = await User.findById(publication.userId)
+
+        publication.comments = await Comment.find({ _id: { $in: publication.comments } })
 
         res.status(200).json({ ...publication, nickname })
 
