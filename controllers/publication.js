@@ -85,3 +85,18 @@ module.exports.getPubl = async (req, res) => {
         })
     }
 }
+
+module.exports.show = async (req, res) => {
+    try {
+
+        const { params: { id } } = req
+
+        const publication = await Publication.findById(id)
+
+        res.status(200).json(publication.view())
+
+    } catch (error) {
+        console.log(error)
+    }
+
+}

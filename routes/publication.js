@@ -9,6 +9,9 @@ router.put("/", passport.authenticate("jwt", { session: false }), controller.pub
 // localhost:5000/api/publication/rate
 router.put("/rate", passport.authenticate("jwt", { session: false }), controller.rate)
 
+// localhost:5000/api/publication/:id
+router.get("/:id", controller.show)
+
 // localhost:5000/api/publication/getAll
 router.get("/getAll/:userId", controller.getPubl)
 

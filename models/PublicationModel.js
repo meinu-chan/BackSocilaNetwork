@@ -26,4 +26,15 @@ const publicationSchema = new Schema({
     ]
 }, { versionKey: false, autoIndex: false });
 
+publicationSchema.methods = {
+    view() {
+        const view = {}
+        const fields = ["userId", "date", "value", "likedUsers", "comments"]
+
+        fields.forEach((field) => view[field] = this.get(field))
+
+        return view
+    }
+}
+
 module.exports = mongoose.model("publications", publicationSchema);
