@@ -35,7 +35,7 @@ module.exports.addComment = async (req, res) => {
     }
 }
 module.exports.getComment = async (req, res) => {
-    const { body: { commentId } } = req
+    const { params: { commentId } } = req
 
     const comment = await Comment.findById({ _id: commentId })
 
