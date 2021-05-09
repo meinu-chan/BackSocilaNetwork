@@ -91,9 +91,11 @@ module.exports.show = async (req, res) => {
 
         const { params: { id } } = req
 
-        const publication = await Publication.findById(id)
+        const p = await Publication.findById(id)
+        const publication = p.view()
+        const { nickname } = await User.findById(publication.userId)
 
-        res.status(200).json({ ...publication.view(), nickname: user.nickname })
+        res.status(200).json({ ...publication, nickname })
 
     } catch (error) {
         console.log(error)
