@@ -1,3 +1,3 @@
 module.exports = {
-    mongoURI: "mongodb://localhost/social-network-back-end", jwt: "dev-jwt"
+    mongoURI: "mongodb://localhost/social-network-back-en", jwt: "dev-jwt"
 }
