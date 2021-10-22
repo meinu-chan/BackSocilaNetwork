@@ -21,6 +21,11 @@ app.use(require("cors")())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
+app.get('/', (req, res) => res.send('SocialNetwork API!'));
+
+app.use((req, res) => res.sendStatus(404));
+
+
 app.use("/api/auth", authRoutes)
 app.use("/api/page", userPageRoutes)
 app.use("/api/publication", publicationRoutes)
